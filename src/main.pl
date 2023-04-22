@@ -1,13 +1,25 @@
+%#########################################
+% @file main.pl                          #
+% @author Boris Štrbák (xstrba05)        #
+%                                        #
+% Parse graph data from input file       #
+% Store nodes and edges in graph         #
+% predicate                              #
+% Find all hamiltonian paths in graph    #
+% starting from first node in nodes list #
+%#########################################
+
+:- dynamic graph/2.
+
+% uncomment for testing in cli
 % graph(['A', 'B', 'C', 'D', 'E', 'F', 'G'], [
 %     ['A','B'],['C','A'],['B','E'],['C','E'],['D','E'],['D','F'],['F','G'],['G','B']
 %     ]).
 
+% uncomment for testing in cli
 % graph(['A', 'B', 'C', 'D'], [
 %     ['A','B'],['A','C'], ['A','D'], ['A','B'], ['B','C'], ['B','D'],['C','D']
 %     ]).
-
-:- dynamic graph/2.
-
 
 reverseAll([], []).
 reverseAll([[A,B]|T], [[B,A]|T2]) :- reverseAll(T,T2).
