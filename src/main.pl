@@ -2,9 +2,12 @@
 %     ['A','B'],['C','A'],['B','E'],['C','E'],['D','E'],['D','F'],['F','G'],['G','B']
 %     ]).
 
-graph(['A', 'B', 'C', 'D'], [
-    ['A','B'],['A','C'], ['A','D'], ['A','B'], ['B','C'], ['B','D'],['C','D']
-    ]).
+% graph(['A', 'B', 'C', 'D'], [
+%     ['A','B'],['A','C'], ['A','D'], ['A','B'], ['B','C'], ['B','D'],['C','D']
+%     ]).
+
+:- dynamic graph/2.
+
 
 reverseAll([], []).
 reverseAll([[A,B]|T], [[B,A]|T2]) :- reverseAll(T,T2).
@@ -15,10 +18,7 @@ concat([A|T],T2,[A|TR]) :- concat(T,T2,TR).
 
 reverseAllEdges(RE) :- graph(_,GE), reverseAll(GE,RE).
 
-allEdges(E) :- graph(_,GE) , reverseAll(GE, RE) , concat(GE,RE,E).
-
-% path(B, A, [[A,B]]) :- graph(_,E) , reverseAll(E, R), concat(E, R, ER) , (member([A,B], ER)).
-% path(A, B, [[A,B]]) :- graph(_,E) , reverseAll(E, R), ((member([A,B], E)) ; member([B,A], R)).
+allEdges(E) :- graph(_,GE) , reverseAll(GE, RE) , concat(GE,RE,EUNS) , sort(EUNS, E).
 
 unfilteredPath(A, B, [[A,B]], V) :- allEdges(E)
                                 , (\+ member([A,B], V), \+ member([B,A], V))
@@ -64,3 +64,57 @@ path2(A,B,X) :- graph(Nodes, _)
                 , filterPaths(All, Nodes, Filtered)
                 , uniquePaths(Filtered, UPaths)
                 , member(X, UPaths).
+
+readLine(L,C) :-
+    get_char(C),
+    (isEOFEOL(C), L = [], !;
+    readLine(LL, _),
+    [C|LL] = L ).
+    isEOFEOL(C) :-
+    C == end_of_file;
+    (char_code(C,Code), Code==10).
+
+readLines(Ls) :-
+    readLine(L, C),
+    (C == end_of_file, Ls=[] ;
+    (readLines(LLs), [L|LLs] = Ls)).
+
+writeLines(_, []) :- !.
+writeLines(OUT, [[A,' ',B]|LLs]) :- char_type(A, upper)
+    , char_type(B, upper)
+    , string_chars(STR, [A, '-', B])
+    , write(OUT, STR)
+    , write(OUT, "\n")
+    , writeLines(OUT, LLs) , !.
+writeLines(OUT, [_|LLs]) :- writeLines(OUT, LLs) , !.
+
+readData(_, [], [], []) :- !.
+readData(OUT, [[A,' ',B]|LLs], [A,B|V], [[A,B]|E]) :-
+    char_type(A, upper)
+    , char_type(B, upper)
+    , readData(OUT, LLs, V, E), !.
+readData(OUT, [_|LLs], V, E) :- readData(OUT, LLs, V, E) , !.
+
+writeEdge(OUT, A, B) :-
+    string_chars(STR, [A, '-', B])
+    , write(OUT, STR) , !.
+
+writePath(_, []) :- !.
+writePath(OUT, [[A,B]]) :-
+    writeEdge(OUT, A, B)
+    , write(OUT, "\n") , !.
+
+writePath(OUT, [[A,B]|LLs]) :-
+    writeEdge(OUT, A, B)
+    , write(OUT, ' ')
+    , writePath(OUT, LLs) , !.
+
+writePaths(_, []) :- !.
+writePaths(OUT, [L|LLs]) :-
+    writePath(OUT, L)
+    , writePaths(OUT, LLs) , !.
+
+main :- readLines(Ls) , readData(current_output, Ls, V, E) , sort(V, [A|SV]) , sort(E, SE)
+    , assertz(graph([A|SV], SE))
+    , bagof(Path, path2(A, A, Path), Paths)
+    , writePaths(current_output, Paths).
