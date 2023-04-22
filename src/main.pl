@@ -16,24 +16,23 @@ concat([], [], []).
 concat([], [A|T2], [A|TR]) :- concat([], T2, TR).
 concat([A|T],T2,[A|TR]) :- concat(T,T2,TR).
 
-reverseAllEdges(RE) :- graph(_,GE), reverseAll(GE,RE).
+allEdges(GE, E) :- reverseAll(GE, RE) , concat(GE,RE,EUNS) , sort(EUNS, E).
 
-allEdges(E) :- graph(_,GE) , reverseAll(GE, RE) , concat(GE,RE,EUNS) , sort(EUNS, E).
-
-unfilteredPath(A, B, [[A,B]], V) :- allEdges(E)
+unfilteredPath(A, B, [[A,B]], V) :- graph(_,E)
                                 , (\+ member([A,B], V), \+ member([B,A], V))
                                 , member([A,B], E).
-unfilteredPath(A, B, [[A,X]|LET], V) :- allEdges(E) , member([A,X], E)
+
+unfilteredPath(A, B, [[A,X]|LET], V) :- graph(_,E) , member([A,X], E)
                                     , (\+ member([A,X], V), \+ member([X,A], V))
                                     , X \= B
                                     , X \= A
                                     , unfilteredPath(X,B,LET, [[A,X]|V]).
 
 filteredPath([], []) :- !.
-filteredPath([A,B], [A,B]) :- graph(_,E) , member([A,B], E).
-filteredPath([A,B], [B,A]) :- graph(_,E) , member([B,A], E).
-filteredPath([[A,B]|XU], [[A,B]|XF]) :- graph(_,E) , member([A,B], E) , filteredPath(XU, XF).
-filteredPath([[A,B]|XU], [[B,A]|XF]) :- graph(_,E) , member([B,A], E) , filteredPath(XU, XF).
+filteredPath([A,B], [A,B]) :- graph(_,E) , sort([A,B], [A,B]) , member([A,B], E).
+filteredPath([A,B], [B,A]) :- graph(_,E) , sort([B,A], [B,A]) , member([B,A], E).
+filteredPath([[A,B]|XU], [[A,B]|XF]) :- graph(_,E) , member([A,B], E), sort([A,B], [A,B]) , filteredPath(XU, XF).
+filteredPath([[A,B]|XU], [[B,A]|XF]) :- graph(_,E) , member([B,A], E), sort([B,A], [B,A]) , filteredPath(XU, XF).
 
 path(A,B,XF) :- unfilteredPath(A,B,XU,[]) , filteredPath(XU, XFUNS) , sort(XFUNS, XF).
 
@@ -115,6 +114,7 @@ writePaths(OUT, [L|LLs]) :-
     , writePaths(OUT, LLs) , !.
 
 main :- readLines(Ls) , readData(current_output, Ls, V, E) , sort(V, [A|SV]) , sort(E, SE)
-    , assertz(graph([A|SV], SE))
+    , allEdges(SE, ALLE)
+    , assertz(graph([A|SV], ALLE))
     , bagof(Path, path2(A, A, Path), Paths)
-    , writePaths(current_output, Paths).
+    , writePaths(current_output, Paths) , !. 
