@@ -1,4 +1,6 @@
 ##########################################
+# Hamiltonovská kružnice                 #
+#                                        #
 # @file Makefile                         #
 # @author Boris Štrbák (xstrba05)        #
 #                                        #

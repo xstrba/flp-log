@@ -1,4 +1,6 @@
 %#########################################
+% Hamiltonovská kružnice                 #
+%                                        #
 % @file main.pl                          #
 % @author Boris Štrbák (xstrba05)        #
 %                                        #

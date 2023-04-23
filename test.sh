@@ -1,6 +1,8 @@
 #!/bin/bash
 
 ##########################################
+# Hamiltonovská kružnice                 #
+#                                        #
 # @file test.sh                          #
 # @author Boris Štrbák (xstrba05)        #
 #                                        #
