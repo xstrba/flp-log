@@ -17,7 +17,7 @@ edge('A','B').
 edge('C','A').
 edge('B','E').
 edge('C','E').
-edge('D','E').
+% edge('D','E').
 edge('D','F').
 edge('F','G').
 edge('G','B').
@@ -26,7 +26,7 @@ edge('B','A').
 edge('A','C').
 edge('E','B').
 edge('E','C').
-edge('E','D').
+% edge('E','D').
 edge('F','D').
 edge('G','F').
 edge('B','G').
