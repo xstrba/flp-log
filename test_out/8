@@ -1,0 +1,17 @@
+A-B A-C B-C B-D B-G C-D C-E D-E D-F F-G
+A-B A-C B-C B-E B-G C-D C-E D-F F-G
+A-B A-C B-C B-E B-G D-E D-F F-G
+A-B A-C B-D B-E B-G C-D D-E D-F F-G
+A-B A-C B-D B-E B-G C-E D-F F-G
+A-B A-C B-G C-E D-E D-F F-G
+A-B A-D B-C B-D B-G C-E D-E D-F F-G
+A-B A-D B-C B-E B-G C-D D-E D-F F-G
+A-B A-D B-C B-E B-G C-E D-F F-G
+A-B A-D B-D B-E B-G C-D C-E D-F F-G
+A-B A-D B-G C-D C-E D-E D-F F-G
+A-C A-D B-C B-D B-E B-G C-D C-E D-F F-G
+A-C A-D B-C B-D B-E B-G D-E D-F F-G
+A-C A-D B-C B-G C-D C-E D-E D-F F-G
+A-C A-D B-D B-G C-E D-E D-F F-G
+A-C A-D B-E B-G C-D D-E D-F F-G
+A-C A-D B-E B-G C-E D-F F-G

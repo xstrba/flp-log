@@ -36,20 +36,23 @@ hasAllNodes(N, P) :- flatten(P, NP)
     , sort(NP, NPs)
     , subset(N, NPs).
 
-uniquePaths(List, Result) :- uniquePaths(List, [], Result).
+reverse([], Lr, Lr).
+reverse([H|T], Acc, Lr) :- reverse(T, [H|Acc], Lr).
 
-uniquePaths([], Acc, Acc).
-uniquePaths([H|T], Acc, Result) :-
-    (member(H, Acc) ; member(RevH, Acc), reverse(H, RevH)),
-    !, uniquePaths(T, Acc, Result).
-uniquePaths([H|T], Acc, Result) :-
-    \+ (member(H, Acc) ; member(RevH, Acc), reverse(H, RevH)),
-    uniquePaths(T, [H|Acc], Result).
+reverseL2(L, Lr) :- reverse(L, [], Lr).
+
+uniquePaths([], Lu, Lu).
+uniquePaths([H|T], Acc, Lu) :- (member(H, Acc) ; member(RevH, Acc), reverse(H, RevH))
+    , uniquePaths(T, Acc, Lu) , !.
+uniquePaths([H|T], Acc, Lu) :- uniquePaths(T, [H|Acc], Lu) , !.
+
+uniquePaths2(L, Lu) :- uniquePaths(L, [], Lu).
 
 path2(A, B, XP) :- nodes(N)
     , paths(A, B, All)
     , filterPaths(All, N, Pfs)
-    , uniquePaths(Pfs, Pfsu)
+    , uniquePaths2(Pfs, Pfsur)
+    , reverseL2(Pfsur, Pfsu)
     , member(XP, Pfsu).
 
 readLine(L, C) :-
