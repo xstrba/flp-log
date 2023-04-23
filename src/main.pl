@@ -11,16 +11,6 @@
 
 :- dynamic nodes/1 , edge/2.
 
-% uncomment for testing in cli
-% graph(['A', 'B', 'C', 'D', 'E', 'F', 'G'], [
-%     ['A','B'],['C','A'],['B','E'],['C','E'],['D','E'],['D','F'],['F','G'],['G','B']
-%     ]).
-
-% uncomment for testing in cli
-% graph(['A', 'B', 'C', 'D'], [
-%     ['A','B'],['A','C'], ['A','D'], ['A','B'], ['B','C'], ['B','D'],['C','D']
-%     ]).
-
 unfilteredPath(A, B, [[A,B]], V) :- (\+ member([A,B], V), \+ member([B,A], V))
                                 , edge(A,B).
 

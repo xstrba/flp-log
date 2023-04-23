@@ -9,6 +9,7 @@
 TARGET=flp22-log
 TARGET_CLI=${TARGET}-cli
 SRC=./src/main.pl
+SRC_CLI=./src/cli.pl
 COMP=swipl
 GOAL=main
 ARCHIVE="flp-log-xstrba05.zip"
@@ -19,8 +20,8 @@ ${TARGET}: ${SRC}
 cli:
 	make ${TARGET_CLI}
 
-${TARGET_CLI}: ${SRC}
-	${COMP} -q -o ${TARGET_CLI} -c ${SRC}
+${TARGET_CLI}: ${SRC} ${SRC_CLI}
+	${COMP} -q -o ${TARGET_CLI} -c ${SRC} ${SRC_CLI}
 
 force:
 	make clean
@@ -31,7 +32,7 @@ clean:
 
 zip:
 	rm -f ${ARCHIVE} || true
-	zip ${ARCHIVE} ${SRC} ./test_in/* ./test_out/* ./test.sh ./Makefile ./README.md
+	zip ${ARCHIVE} ${SRC} ${SRC_CLI} ./test_in/* ./test_out/* ./test.sh ./Makefile ./README.md
 
 test:
 	@echo "Recompiling program"
