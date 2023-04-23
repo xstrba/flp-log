@@ -66,14 +66,16 @@ readLines(Ls) :- readLine(L, C)
     , (C == end_of_file, Ls=[]
     ; (readLines(LLs), [L|LLs] = Ls)).
 
-readData(_, [], []) :- !.
-readData(OUT, [[A,' ',B]|LLs], [A,B|V]) :-
+readData(_, []) :- !.
+readData(OUT, [[A,' ',B]|LLs]) :-
     char_type(A, upper)
     , char_type(B, upper)
+    , (\+ node(A) -> assertz(node(A)) ; true)
+    , (\+ node(B) -> assertz(node(B)) ; true)
     , (\+ edge(A,B) -> assertz(edge(A,B)) ; true)
     , (\+ edge(B,A) -> assertz(edge(B,A)) ; true)
-    , readData(OUT, LLs, V), !.
-readData(OUT, [_|LLs], V) :- readData(OUT, LLs, V) , !.
+    , readData(OUT, LLs), !.
+readData(OUT, [_|LLs]) :- readData(OUT, LLs) , !.
 
 writeEdge(OUT, A, B) :-
     string_chars(STR, [A, '-', B])
@@ -94,7 +96,9 @@ writePaths(OUT, [L|LLs]) :-
     writePath(OUT, L)
     , writePaths(OUT, LLs) , !.
 
-main :- readLines(Ls) , readData(current_output, Ls, V) , sort(V, [A|SV])
+main :- readLines(Ls) , readData(current_output, Ls)
+    , bagof(N, node(N), Ns)
+    , sort(Ns, [A|SV])
     , assertz(nodes([A|SV]))
     , (bagof(P, path2(A, A, P), Ps) -> (
         writePaths(current_output, Ps) , !
