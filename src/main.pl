@@ -9,7 +9,7 @@
 % starting from first node in nodes list #
 %#########################################
 
-:- dynamic graph/2.
+:- dynamic nodes/1 , edge/2.
 
 % uncomment for testing in cli
 % graph(['A', 'B', 'C', 'D', 'E', 'F', 'G'], [
@@ -21,30 +21,20 @@
 %     ['A','B'],['A','C'], ['A','D'], ['A','B'], ['B','C'], ['B','D'],['C','D']
 %     ]).
 
-reverseAll([], []).
-reverseAll([[A,B]|T], [[B,A]|T2]) :- reverseAll(T,T2).
+unfilteredPath(A, B, [[A,B]], V) :- (\+ member([A,B], V), \+ member([B,A], V))
+                                , edge(A,B).
 
-concat([], [], []).
-concat([], [A|T2], [A|TR]) :- concat([], T2, TR).
-concat([A|T],T2,[A|TR]) :- concat(T,T2,TR).
-
-allEdges(GE, E) :- reverseAll(GE, RE) , concat(GE,RE,EUNS) , sort(EUNS, E).
-
-unfilteredPath(A, B, [[A,B]], V) :- graph(_,E)
-                                , (\+ member([A,B], V), \+ member([B,A], V))
-                                , member([A,B], E).
-
-unfilteredPath(A, B, [[A,X]|LET], V) :- graph(_,E) , member([A,X], E)
+unfilteredPath(A, B, [[A,X]|LET], V) :- edge(A,X)
                                     , (\+ member([A,X], V), \+ member([X,A], V))
                                     , X \= B
                                     , X \= A
                                     , unfilteredPath(X,B,LET, [[A,X]|V]).
 
 filteredPath([], []) :- !.
-filteredPath([A,B], [A,B]) :- graph(_,E) , sort([A,B], [A,B]) , member([A,B], E).
-filteredPath([A,B], [B,A]) :- graph(_,E) , sort([B,A], [B,A]) , member([B,A], E).
-filteredPath([[A,B]|XU], [[A,B]|XF]) :- graph(_,E) , member([A,B], E), sort([A,B], [A,B]) , filteredPath(XU, XF).
-filteredPath([[A,B]|XU], [[B,A]|XF]) :- graph(_,E) , member([B,A], E), sort([B,A], [B,A]) , filteredPath(XU, XF).
+filteredPath([A,B], [A,B]) :- sort([A,B], [A,B]) , edge(A,B).
+filteredPath([A,B], [B,A]) :- sort([B,A], [B,A]) , edge(B,A).
+filteredPath([[A,B]|XU], [[A,B]|XF]) :- edge(A,B), sort([A,B], [A,B]) , filteredPath(XU, XF).
+filteredPath([[A,B]|XU], [[B,A]|XF]) :- edge(B,A), sort([B,A], [B,A]) , filteredPath(XU, XF).
 
 path(A,B,XF) :- unfilteredPath(A,B,XU,[]) , filteredPath(XU, XFUNS) , sort(XFUNS, XF).
 
@@ -70,7 +60,7 @@ uniquePaths([H|T], Acc, Result) :-
     \+ (member(H, Acc) ; member(RevH, Acc), reverse(H, RevH)),
     uniquePaths(T, [H|Acc], Result).
 
-path2(A,B,X) :- graph(Nodes, _)
+path2(A,B,X) :- nodes(Nodes)
                 , paths(A,B,All)
                 , filterPaths(All, Nodes, Filtered)
                 , uniquePaths(Filtered, UPaths)
@@ -99,12 +89,14 @@ writeLines(OUT, [[A,' ',B]|LLs]) :- char_type(A, upper)
     , writeLines(OUT, LLs) , !.
 writeLines(OUT, [_|LLs]) :- writeLines(OUT, LLs) , !.
 
-readData(_, [], [], []) :- !.
-readData(OUT, [[A,' ',B]|LLs], [A,B|V], [[A,B]|E]) :-
+readData(_, [], []) :- !.
+readData(OUT, [[A,' ',B]|LLs], [A,B|V]) :-
     char_type(A, upper)
     , char_type(B, upper)
-    , readData(OUT, LLs, V, E), !.
-readData(OUT, [_|LLs], V, E) :- readData(OUT, LLs, V, E) , !.
+    , assertz(edge(A,B))
+    , assertz(edge(B,A))
+    , readData(OUT, LLs, V), !.
+readData(OUT, [_|LLs], V) :- readData(OUT, LLs, V) , !.
 
 writeEdge(OUT, A, B) :-
     string_chars(STR, [A, '-', B])
@@ -125,8 +117,7 @@ writePaths(OUT, [L|LLs]) :-
     writePath(OUT, L)
     , writePaths(OUT, LLs) , !.
 
-main :- readLines(Ls) , readData(current_output, Ls, V, E) , sort(V, [A|SV]) , sort(E, SE)
-    , allEdges(SE, ALLE)
-    , assertz(graph([A|SV], ALLE))
+main :- readLines(Ls) , readData(current_output, Ls, V) , sort(V, [A|SV])
+    , assertz(nodes([A|SV]))
     , bagof(Path, path2(A, A, Path), Paths)
     , writePaths(current_output, Paths) , !. 
