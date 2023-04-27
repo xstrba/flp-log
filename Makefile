@@ -17,7 +17,7 @@ GOAL=main
 ARCHIVE="flp-log-xstrba05.zip"
 
 ${TARGET}: ${SRC}
-	${COMP} --goal=${GOAL} --stand_alone=true -o ${TARGET} -c ${SRC}
+	${COMP} -q --goal=${GOAL} --stand_alone=true -o ${TARGET} -c ${SRC}
 
 cli:
 	make ${TARGET_CLI}

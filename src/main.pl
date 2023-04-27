@@ -104,14 +104,12 @@ readData([[A,' ',B]|LLs]) :-
 readData([_|LLs]) :- readData(LLs) , !.
 
 % functions for printing path to output
-writeEdge(OUT, A, B) :-
-    string_chars(STR, [A, '-', B])
-    , write(OUT, STR) , !.
+writeEdge(OUT, A, B) :- write(OUT, A), write(OUT, '-'), write(OUT, B), !.
 
 writePath(_, []) :- !.
 writePath(OUT, [[A,B]]) :-
     writeEdge(OUT, A, B)
-    , write(OUT, "\n") , !.
+    , write(OUT, '\n') , !.
 
 writePath(OUT, [[A,B]|LLs]) :-
     writeEdge(OUT, A, B)
